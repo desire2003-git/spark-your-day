@@ -16,14 +16,17 @@ export type Database = {
     Tables: {
       motivation_messages: {
         Row: {
+          content: string
           created_at: string
           id: string
         }
         Insert: {
+          content?: string
           created_at?: string
           id?: string
         }
         Update: {
+          content?: string
           created_at?: string
           id?: string
         }
