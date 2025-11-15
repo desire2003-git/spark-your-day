@@ -18,6 +18,47 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY not configured');
     }
 
+    const { name, motivationLevel, goal } = await req.json();
+
+    // Validation
+    if (name && typeof name !== 'string') {
+      throw new Error('Invalid name parameter');
+    }
+    if (motivationLevel && !['faible', 'moyen', 'élevé'].includes(motivationLevel)) {
+      throw new Error('Invalid motivation level');
+    }
+    if (goal && typeof goal !== 'string') {
+      throw new Error('Invalid goal parameter');
+    }
+
+    // Validate lengths
+    if (name && name.length > 50) {
+      throw new Error('Name too long');
+    }
+    if (goal && goal.length > 100) {
+      throw new Error('Goal too long');
+    }
+
+    let systemPrompt = 'Tu es un coach motivant, inspirant et dynamique. Crée un message motivant unique, court et percutant (moins de 50 mots). Ton amical et encourageant. Utilise des verbes d\'action. Retourne uniquement le message, sans guillemets ni formatage.';
+    let userPrompt = 'Génère un nouveau message de motivation inspirant.';
+
+    // If personalized parameters are provided, customize the prompt
+    if (name && motivationLevel && goal) {
+      systemPrompt = `Tu es un coach motivant et inspirant. Tu dois créer un message motivant personnalisé en fonction des informations suivantes :
+- Nom : ${name}
+- Niveau de motivation : ${motivationLevel}
+- Objectif ou domaine : ${goal}
+
+Règles :
+1. Message court et percutant (moins de 50 mots).
+2. Ton chaleureux, encourageant et amical.
+3. Inclure des verbes d'action pour stimuler la motivation.
+4. Le message doit être inspirant et positif.
+5. Retourne uniquement le message, sans guillemets ni formatage.`;
+      
+      userPrompt = `Génère un message motivant unique et personnalisé pour ${name} qui a un niveau de motivation ${motivationLevel} et veut être motivé dans : ${goal}`;
+    }
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -27,14 +68,8 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { 
-            role: 'system', 
-            content: 'Tu es un coach motivant, inspirant et dynamique. Crée un message motivant unique, court et percutant (moins de 50 mots). Ton amical et encourageant. Utilise des verbes d\'action. Retourne uniquement le message, sans guillemets ni formatage.'
-          },
-          { 
-            role: 'user', 
-            content: 'Génère un nouveau message de motivation inspirant.'
-          }
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
         ],
         max_tokens: 100,
         temperature: 0.9,

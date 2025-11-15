@@ -1,13 +1,21 @@
 import { useState } from "react";
 import { getRandomMessage } from "@/data/messages";
 import MessageCard from "@/components/MessageCard";
+import PersonalizedMessageForm from "@/components/PersonalizedMessageForm";
 import { Zap } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [message, setMessage] = useState(getRandomMessage());
+  const [showPersonalizedForm, setShowPersonalizedForm] = useState(false);
 
   const handleNewMessage = () => {
     setMessage(getRandomMessage());
+  };
+
+  const handlePersonalizedMessage = (generatedMessage: string) => {
+    setMessage(generatedMessage);
+    setShowPersonalizedForm(false);
   };
 
   return (
@@ -25,7 +33,21 @@ const Index = () => {
           </p>
         </header>
 
-        <MessageCard message={message} onNewMessage={handleNewMessage} />
+        <div className="flex justify-center mb-4">
+          <Button
+            variant={showPersonalizedForm ? "default" : "outline"}
+            onClick={() => setShowPersonalizedForm(!showPersonalizedForm)}
+            className="transition-all"
+          >
+            {showPersonalizedForm ? "Mode aléatoire" : "Message personnalisé ✨"}
+          </Button>
+        </div>
+
+        {showPersonalizedForm ? (
+          <PersonalizedMessageForm onMessageGenerated={handlePersonalizedMessage} />
+        ) : (
+          <MessageCard message={message} onNewMessage={handleNewMessage} />
+        )}
 
         <footer className="text-center text-sm text-muted-foreground animate-fade-in">
           Partage ta motivation avec tes proches ✨
