@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Sparkles, Copy, Check } from "lucide-react";
+import { Sparkles, Copy, Check, Database } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MessageCardProps {
   message: string;
@@ -11,6 +12,7 @@ interface MessageCardProps {
 
 const MessageCard = ({ message, onNewMessage }: MessageCardProps) => {
   const [copied, setCopied] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleCopy = async () => {
     try {
@@ -22,6 +24,26 @@ const MessageCard = ({ message, onNewMessage }: MessageCardProps) => {
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       toast.error("Erreur lors de la copie");
+    }
+  };
+
+  const handleSaveToSupabase = async () => {
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('motivation_messages')
+        .insert({ content: message });
+
+      if (error) throw error;
+
+      toast.success("Message enregistré !", {
+        description: "Le message a été sauvegardé dans Supabase.",
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'enregistrement:", error);
+      toast.error("Erreur lors de l'enregistrement");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -65,6 +87,17 @@ const MessageCard = ({ message, onNewMessage }: MessageCardProps) => {
                 Copier
               </>
             )}
+          </Button>
+
+          <Button
+            onClick={handleSaveToSupabase}
+            variant="outline"
+            size="lg"
+            disabled={isSaving}
+            className="sm:w-auto border-2 hover:bg-accent/20 text-lg font-semibold"
+          >
+            <Database className="mr-2 h-5 w-5" />
+            {isSaving ? "Enregistrement..." : "Enregistrer dans Supabase"}
           </Button>
         </div>
       </div>
