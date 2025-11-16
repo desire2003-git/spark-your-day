@@ -1,7 +1,7 @@
 project_id = "cduzkvxpzfvwkgeqeqgi"
 
 [functions.generate-motivation]
-verify_jwt = false
+verify_jwt = true
 
 [functions.get-messages]
-verify_jwt = false
+verify_jwt = true
