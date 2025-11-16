@@ -32,7 +32,7 @@ const MessageCard = ({ message, onNewMessage }: MessageCardProps) => {
     try {
       const { error } = await supabase
         .from('motivation_messages')
-        .insert({ content: message });
+        .insert({ message: message });
 
       if (error) throw error;
 

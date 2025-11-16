@@ -1,57 +1,51 @@
 import { useState } from "react";
-import { getRandomMessage } from "@/data/messages";
-import MessageCard from "@/components/MessageCard";
-import PersonalizedMessageForm from "@/components/PersonalizedMessageForm";
-import { Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MotivationForm } from "@/components/MotivationForm";
+import { MotivationResult } from "@/components/MotivationResult";
+import { History } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
-  const [message, setMessage] = useState(getRandomMessage());
-  const [showPersonalizedForm, setShowPersonalizedForm] = useState(false);
+  const navigate = useNavigate();
+  const [generatedMessage, setGeneratedMessage] = useState<string | null>(null);
 
-  const handleNewMessage = () => {
-    setMessage(getRandomMessage());
+  const handleMessageGenerated = (message: string) => {
+    setGeneratedMessage(message);
   };
 
-  const handlePersonalizedMessage = (generatedMessage: string) => {
-    setMessage(generatedMessage);
-    setShowPersonalizedForm(false);
+  const handleReset = () => {
+    setGeneratedMessage(null);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-soft flex flex-col items-center justify-center p-4">
-      <div className="max-w-4xl w-full space-y-8">
-        <header className="text-center space-y-4 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-primary mb-4 shadow-[var(--shadow-glow)]">
-            <Zap className="w-10 h-10 text-primary-foreground" />
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Dose de Motivation
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex flex-col items-center justify-center p-4 md:p-8">
+      <div className="w-full max-w-2xl space-y-6">
+        <div className="text-center space-y-4 mb-8">
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-primary bg-clip-text text-transparent animate-fade-in">
+            AI Motivation Maker
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Chaque jour, une nouvelle inspiration pour booster ton énergie et ta confiance.
+          <p className="text-xl text-muted-foreground animate-fade-in">
+            Votre coach personnel alimenté par l'intelligence artificielle
           </p>
-        </header>
-
-        <div className="flex justify-center mb-4">
-          <Button
-            variant={showPersonalizedForm ? "default" : "outline"}
-            onClick={() => setShowPersonalizedForm(!showPersonalizedForm)}
-            className="transition-all"
-          >
-            {showPersonalizedForm ? "Mode aléatoire" : "Message personnalisé ✨"}
-          </Button>
         </div>
 
-        {showPersonalizedForm ? (
-          <PersonalizedMessageForm onMessageGenerated={handlePersonalizedMessage} />
+        {generatedMessage ? (
+          <MotivationResult message={generatedMessage} onReset={handleReset} />
         ) : (
-          <MessageCard message={message} onNewMessage={handleNewMessage} />
+          <MotivationForm onMessageGenerated={handleMessageGenerated} />
         )}
 
-        <footer className="text-center text-sm text-muted-foreground animate-fade-in">
-          Partage ta motivation avec tes proches ✨
-        </footer>
+        <div className="flex justify-center pt-4">
+          <Button
+            onClick={() => navigate('/historique')}
+            variant="outline"
+            size="lg"
+            className="border-2 hover:bg-accent/20"
+          >
+            <History className="mr-2 h-5 w-5" />
+            Voir l'historique
+          </Button>
+        </div>
       </div>
     </div>
   );
