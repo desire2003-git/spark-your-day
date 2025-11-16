@@ -16,19 +16,28 @@ export type Database = {
     Tables: {
       motivation_messages: {
         Row: {
-          content: string
           created_at: string
           id: string
+          message: string
+          niveau: string | null
+          nom: string | null
+          objectif: string | null
         }
         Insert: {
-          content?: string
           created_at?: string
           id?: string
+          message?: string
+          niveau?: string | null
+          nom?: string | null
+          objectif?: string | null
         }
         Update: {
-          content?: string
           created_at?: string
           id?: string
+          message?: string
+          niveau?: string | null
+          nom?: string | null
+          objectif?: string | null
         }
         Relationships: []
       }
